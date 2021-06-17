@@ -1,3 +1,3 @@
 from networks import UNet
 
-# UNet({})
+model = UNet({})

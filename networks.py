@@ -13,7 +13,7 @@ class UNet(Model):
         self.dec = Decoder(config)
 
         # Optimizer
-        self.optimizer = tf.keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
 
         # loss
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
@@ -144,7 +144,7 @@ class Decoder(Model):
         self.block9_conv3 = tf.keras.layers.Conv2D(64, (3, 3) , name='block9_conv3', padding = 'same')
         self.block9_bn = tf.keras.layers.BatchNormalization()
         self.block9_act = tf.keras.layers.ReLU()
-        self.output_conv = tf.keras.layers.Conv2D(config.model.num_class, (1, 1), name='output_conv', activation = 'sigmoid')
+        self.output_conv = tf.keras.layers.Conv2D(2, (1, 1), name='output_conv', activation = 'sigmoid')
 
     def call(self, z1, z2, z3, z4_dropout, z5_dropout):
         z6_up = self.block6_up(z5_dropout)
