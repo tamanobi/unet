@@ -1,0 +1,14 @@
+schema: '2.0'
+stages:
+  color_to_segmentation_class:
+    cmd: python ./preprocess.py
+    deps:
+    - path: data/SegmentationClass/
+      md5: 1a21b645fa62272a505c3d59e7c3075e.dir
+      size: 6704
+      nfiles: 2
+    outs:
+    - path: ./zero_one/
+      md5: 2bfab206535e5bb969245429ae8ecdcb.dir
+      size: 4383
+      nfiles: 2

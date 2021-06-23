@@ -4,7 +4,7 @@ import numpy as np
 from pathlib import Path
 
 d = Path("data/SegmentationClass")
-out_d = Path("data/zero_one")
+out_d = Path("zero_one")
 if not out_d.exists():
     out_d.mkdir()
 for path in d.glob("*.png"):
@@ -22,4 +22,4 @@ for path in d.glob("*.png"):
     output[rs, cs, :] = [1, 1, 1]
     print(output[0, 0, :])
     zero_one = image.array_to_img(output, scale=False)
-    image.save_img(str(out_d / d.name), zero_one)
+    image.save_img(str(out_d / path.name), zero_one)

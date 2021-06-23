@@ -1,0 +1,7 @@
+stages:
+  color_to_segmentation_class:
+    cmd: python ./preprocess.py
+    deps:
+    - data/SegmentationClass/
+    outs:
+    - ./zero_one/
