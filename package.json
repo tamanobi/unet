@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "check": "pyright ."
+  },
+  "dependencies": {
+    "pyright": "^1.1.152"
+  }
+}

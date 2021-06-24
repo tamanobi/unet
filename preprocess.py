@@ -5,7 +5,7 @@ from pathlib import Path
 from PIL import Image
 
 
-def save_as_indexed_png(filepath: Path, gray):
+def save_as_indexed_png(filepath: Path, gray: np.ndarray) -> None:
     palette = sum([
         [0, 0, 0],
         [255, 255, 255]]
