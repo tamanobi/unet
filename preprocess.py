@@ -17,7 +17,7 @@ for path in d.glob("*.png"):
     print(arr.shape)
     print(arr[0, 0, :])
     output = arr.copy()
-    valid = np.all(arr == [255,0,124], axis=-1)
+    valid = np.all(arr == [255, 0, 124], axis=-1)
     print(np.sum(valid))
     rs, cs = valid.nonzero()
     output[rs, cs, :] = [1, 1, 1]

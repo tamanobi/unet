@@ -3,7 +3,15 @@ import numpy as np
 import random
 import tensorflow as tf
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Conv2D, Activation, BatchNormalization, Dropout, Flatten, Dense
+from tensorflow.keras.layers import (
+    Conv2D,
+    Activation,
+    BatchNormalization,
+    Dropout,
+    Flatten,
+    Dense,
+)
+
 
 class UNet(Model):
     def __init__(self, config):
@@ -13,12 +21,19 @@ class UNet(Model):
         self.dec = Decoder(config)
 
         # Optimizer
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+        self.optimizer = tf.keras.optimizers.Adam(
+            learning_rate=0.001,
+            beta_1=0.9,
+            beta_2=0.999,
+            epsilon=None,
+            decay=0.0,
+            amsgrad=False,
+        )
 
         # loss
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
-        self.train_loss = tf.keras.metrics.Mean('train_loss', dtype=tf.float32)
-        self.valid_loss = tf.keras.metrics.Mean('valid_loss', dtype=tf.float32)
+        self.train_loss = tf.keras.metrics.Mean("train_loss", dtype=tf.float32)
+        self.valid_loss = tf.keras.metrics.Mean("valid_loss", dtype=tf.float32)
 
     def call(self, x):
         z1, z2, z3, z4_dropout, z5_dropout = self.enc(x)
@@ -33,7 +48,7 @@ class UNet(Model):
             loss = self.loss_object(t, y)
         gradients = tape.gradient(loss, self.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
-        self.train_loss(loss)    
+        self.train_loss(loss)
 
     @tf.function
     def valid_step(self, x, t):
@@ -48,33 +63,61 @@ class Encoder(Model):
     def __init__(self, config):
         super().__init__()
         # Network
-        self.block1_conv1 = tf.keras.layers.Conv2D(64, (3, 3) , name='block1_conv1', activation = 'relu', padding = 'same')
-        self.block1_conv2 = tf.keras.layers.Conv2D(64, (3, 3) , name='block1_conv2', padding = 'same')
+        self.block1_conv1 = tf.keras.layers.Conv2D(
+            64, (3, 3), name="block1_conv1", activation="relu", padding="same"
+        )
+        self.block1_conv2 = tf.keras.layers.Conv2D(
+            64, (3, 3), name="block1_conv2", padding="same"
+        )
         self.block1_bn = tf.keras.layers.BatchNormalization()
         self.block1_act = tf.keras.layers.ReLU()
-        self.block1_pool = tf.keras.layers.MaxPooling2D((2, 2), strides=None, name='block1_pool')
+        self.block1_pool = tf.keras.layers.MaxPooling2D(
+            (2, 2), strides=None, name="block1_pool"
+        )
 
-        self.block2_conv1 = tf.keras.layers.Conv2D(128, (3, 3) , name='block2_conv1', activation = 'relu', padding = 'same')
-        self.block2_conv2 = tf.keras.layers.Conv2D(128, (3, 3) , name='block2_conv2', padding = 'same')
+        self.block2_conv1 = tf.keras.layers.Conv2D(
+            128, (3, 3), name="block2_conv1", activation="relu", padding="same"
+        )
+        self.block2_conv2 = tf.keras.layers.Conv2D(
+            128, (3, 3), name="block2_conv2", padding="same"
+        )
         self.block2_bn = tf.keras.layers.BatchNormalization()
         self.block2_act = tf.keras.layers.ReLU()
-        self.block2_pool = tf.keras.layers.MaxPooling2D((2, 2), strides=None, name='block2_pool')
+        self.block2_pool = tf.keras.layers.MaxPooling2D(
+            (2, 2), strides=None, name="block2_pool"
+        )
 
-        self.block3_conv1 = tf.keras.layers.Conv2D(256, (3, 3) , name='block3_conv1', activation = 'relu', padding = 'same')
-        self.block3_conv2 = tf.keras.layers.Conv2D(256, (3, 3) , name='block3_conv2', padding = 'same')
+        self.block3_conv1 = tf.keras.layers.Conv2D(
+            256, (3, 3), name="block3_conv1", activation="relu", padding="same"
+        )
+        self.block3_conv2 = tf.keras.layers.Conv2D(
+            256, (3, 3), name="block3_conv2", padding="same"
+        )
         self.block3_bn = tf.keras.layers.BatchNormalization()
         self.block3_act = tf.keras.layers.ReLU()
-        self.block3_pool = tf.keras.layers.MaxPooling2D((2, 2), strides=None, name='block3_pool')
+        self.block3_pool = tf.keras.layers.MaxPooling2D(
+            (2, 2), strides=None, name="block3_pool"
+        )
 
-        self.block4_conv1 = tf.keras.layers.Conv2D(512, (3, 3) , name='block4_conv1', activation = 'relu', padding = 'same')
-        self.block4_conv2 = tf.keras.layers.Conv2D(512, (3, 3) , name='block4_conv2', padding = 'same')
+        self.block4_conv1 = tf.keras.layers.Conv2D(
+            512, (3, 3), name="block4_conv1", activation="relu", padding="same"
+        )
+        self.block4_conv2 = tf.keras.layers.Conv2D(
+            512, (3, 3), name="block4_conv2", padding="same"
+        )
         self.block4_bn = tf.keras.layers.BatchNormalization()
         self.block4_act = tf.keras.layers.ReLU()
         self.block4_dropout = tf.keras.layers.Dropout(0.5)
-        self.block4_pool = tf.keras.layers.MaxPooling2D((2, 2), strides=None, name='block4_pool')
+        self.block4_pool = tf.keras.layers.MaxPooling2D(
+            (2, 2), strides=None, name="block4_pool"
+        )
 
-        self.block5_conv1 = tf.keras.layers.Conv2D(1024, (3, 3) , name='block5_conv1', activation = 'relu', padding = 'same')
-        self.block5_conv2 = tf.keras.layers.Conv2D(1024, (3, 3) , name='block5_conv2', padding = 'same')
+        self.block5_conv1 = tf.keras.layers.Conv2D(
+            1024, (3, 3), name="block5_conv1", activation="relu", padding="same"
+        )
+        self.block5_conv2 = tf.keras.layers.Conv2D(
+            1024, (3, 3), name="block5_conv2", padding="same"
+        )
         self.block5_bn = tf.keras.layers.BatchNormalization()
         self.block5_act = tf.keras.layers.ReLU()
         self.block5_dropout = tf.keras.layers.Dropout(0.5)
@@ -113,43 +156,70 @@ class Encoder(Model):
 
         return z1, z2, z3, z4_dropout, z5_dropout
 
+
 class Decoder(Model):
     def __init__(self, config):
         super().__init__()
         # Network
-        self.block6_up = tf.keras.layers.UpSampling2D(size = (2,2))
-        self.block6_conv1 = tf.keras.layers.Conv2D(512, (2, 2) , name='block6_conv1', activation = 'relu', padding = 'same')
-        self.block6_conv2 = tf.keras.layers.Conv2D(512, (3, 3) , name='block6_conv2', activation = 'relu', padding = 'same')
-        self.block6_conv3 = tf.keras.layers.Conv2D(512, (3, 3) , name='block6_conv3', padding = 'same')
+        self.block6_up = tf.keras.layers.UpSampling2D(size=(2, 2))
+        self.block6_conv1 = tf.keras.layers.Conv2D(
+            512, (2, 2), name="block6_conv1", activation="relu", padding="same"
+        )
+        self.block6_conv2 = tf.keras.layers.Conv2D(
+            512, (3, 3), name="block6_conv2", activation="relu", padding="same"
+        )
+        self.block6_conv3 = tf.keras.layers.Conv2D(
+            512, (3, 3), name="block6_conv3", padding="same"
+        )
         self.block6_bn = tf.keras.layers.BatchNormalization()
         self.block6_act = tf.keras.layers.ReLU()
 
-        self.block7_up = tf.keras.layers.UpSampling2D(size = (2,2))
-        self.block7_conv1 = tf.keras.layers.Conv2D(256, (2, 2) , name='block7_conv1', activation = 'relu', padding = 'same')
-        self.block7_conv2 = tf.keras.layers.Conv2D(256, (3, 3) , name='block7_conv2', activation = 'relu', padding = 'same')
-        self.block7_conv3 = tf.keras.layers.Conv2D(256, (3, 3) , name='block7_conv3', padding = 'same')
+        self.block7_up = tf.keras.layers.UpSampling2D(size=(2, 2))
+        self.block7_conv1 = tf.keras.layers.Conv2D(
+            256, (2, 2), name="block7_conv1", activation="relu", padding="same"
+        )
+        self.block7_conv2 = tf.keras.layers.Conv2D(
+            256, (3, 3), name="block7_conv2", activation="relu", padding="same"
+        )
+        self.block7_conv3 = tf.keras.layers.Conv2D(
+            256, (3, 3), name="block7_conv3", padding="same"
+        )
         self.block7_bn = tf.keras.layers.BatchNormalization()
         self.block7_act = tf.keras.layers.ReLU()
 
-        self.block8_up = tf.keras.layers.UpSampling2D(size = (2,2))
-        self.block8_conv1 = tf.keras.layers.Conv2D(128, (2, 2) , name='block8_conv1', activation = 'relu', padding = 'same')
-        self.block8_conv2 = tf.keras.layers.Conv2D(128, (3, 3) , name='block8_conv2', activation = 'relu', padding = 'same')
-        self.block8_conv3 = tf.keras.layers.Conv2D(128, (3, 3) , name='block8_conv3', padding = 'same')
+        self.block8_up = tf.keras.layers.UpSampling2D(size=(2, 2))
+        self.block8_conv1 = tf.keras.layers.Conv2D(
+            128, (2, 2), name="block8_conv1", activation="relu", padding="same"
+        )
+        self.block8_conv2 = tf.keras.layers.Conv2D(
+            128, (3, 3), name="block8_conv2", activation="relu", padding="same"
+        )
+        self.block8_conv3 = tf.keras.layers.Conv2D(
+            128, (3, 3), name="block8_conv3", padding="same"
+        )
         self.block8_bn = tf.keras.layers.BatchNormalization()
         self.block8_act = tf.keras.layers.ReLU()
 
-        self.block9_up = tf.keras.layers.UpSampling2D(size = (2,2))
-        self.block9_conv1 = tf.keras.layers.Conv2D(64, (2, 2) , name='block9_conv1', activation = 'relu', padding = 'same')
-        self.block9_conv2 = tf.keras.layers.Conv2D(64, (3, 3) , name='block9_conv2', activation = 'relu', padding = 'same')
-        self.block9_conv3 = tf.keras.layers.Conv2D(64, (3, 3) , name='block9_conv3', padding = 'same')
+        self.block9_up = tf.keras.layers.UpSampling2D(size=(2, 2))
+        self.block9_conv1 = tf.keras.layers.Conv2D(
+            64, (2, 2), name="block9_conv1", activation="relu", padding="same"
+        )
+        self.block9_conv2 = tf.keras.layers.Conv2D(
+            64, (3, 3), name="block9_conv2", activation="relu", padding="same"
+        )
+        self.block9_conv3 = tf.keras.layers.Conv2D(
+            64, (3, 3), name="block9_conv3", padding="same"
+        )
         self.block9_bn = tf.keras.layers.BatchNormalization()
         self.block9_act = tf.keras.layers.ReLU()
-        self.output_conv = tf.keras.layers.Conv2D(2, (1, 1), name='output_conv', activation = 'sigmoid')
+        self.output_conv = tf.keras.layers.Conv2D(
+            2, (1, 1), name="output_conv", activation="sigmoid"
+        )
 
     def call(self, z1, z2, z3, z4_dropout, z5_dropout):
         z6_up = self.block6_up(z5_dropout)
         z6 = self.block6_conv1(z6_up)
-        z6 = tf.keras.layers.concatenate([z4_dropout,z6], axis = 3)
+        z6 = tf.keras.layers.concatenate([z4_dropout, z6], axis=3)
         z6 = self.block6_conv2(z6)
         z6 = self.block6_conv3(z6)
         z6 = self.block6_bn(z6)
@@ -157,7 +227,7 @@ class Decoder(Model):
 
         z7_up = self.block7_up(z6)
         z7 = self.block7_conv1(z7_up)
-        z7 = tf.keras.layers.concatenate([z3, z7], axis = 3)
+        z7 = tf.keras.layers.concatenate([z3, z7], axis=3)
         z7 = self.block7_conv2(z7)
         z7 = self.block7_conv3(z7)
         z7 = self.block7_bn(z7)
@@ -165,7 +235,7 @@ class Decoder(Model):
 
         z8_up = self.block8_up(z7)
         z8 = self.block8_conv1(z8_up)
-        z8 = tf.keras.layers.concatenate([z2, z8], axis = 3)
+        z8 = tf.keras.layers.concatenate([z2, z8], axis=3)
         z8 = self.block8_conv2(z8)
         z8 = self.block8_conv3(z8)
         z8 = self.block8_bn(z8)
@@ -173,7 +243,7 @@ class Decoder(Model):
 
         z9_up = self.block9_up(z8)
         z9 = self.block9_conv1(z9_up)
-        z9 = tf.keras.layers.concatenate([z1, z9], axis = 3)
+        z9 = tf.keras.layers.concatenate([z1, z9], axis=3)
         z9 = self.block9_conv2(z9)
         z9 = self.block9_conv3(z9)
         z9 = self.block9_bn(z9)
@@ -181,4 +251,3 @@ class Decoder(Model):
         y = self.output_conv(z9)
 
         return y
-
