@@ -6,14 +6,12 @@ from PIL import Image
 
 
 def save_as_indexed_png(filepath: Path, gray: np.ndarray) -> None:
-    palette = sum([
-        [0, 0, 0],
-        [255, 255, 255]]
-    , [])
+    palette = sum([[0, 0, 0], [255, 255, 255]], [])
 
     with Image.fromarray(gray, mode="P") as img:
         img.putpalette(palette)
         img.save(str(filepath))
+
 
 d = Path("data/SegmentationClass")
 out_d = Path("zero_one")
