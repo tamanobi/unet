@@ -2,6 +2,8 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 import numpy as np
 from pathlib import Path
+from PIL import Image
+
 
 d = Path("data/SegmentationClass")
 out_d = Path("zero_one")
@@ -18,8 +20,8 @@ for path in d.glob("*.png"):
     valid = np.all(arr == [255,0,124], axis=-1)
     print(np.sum(valid))
     rs, cs = valid.nonzero()
-    print(rs, cs)
     output[rs, cs, :] = [1, 1, 1]
-    print(output[0, 0, :])
-    zero_one = image.array_to_img(output, scale=False)
-    image.save_img(str(out_d / path.name), zero_one)
+    with Image.fromarray(output[:, :, 0], mode="P") as img:
+        img.putpalette(sum([[0, 0, 0], [255, 255, 255]], []))
+        img.save(str(out_d / path.name))
+    # zero_one = image.array_to_img(output, scale=False)
