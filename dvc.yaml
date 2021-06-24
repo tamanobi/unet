@@ -3,5 +3,6 @@ stages:
     cmd: python ./preprocess.py
     deps:
     - data/SegmentationClass/
+    - preprocess.py
     outs:
     - ./zero_one/

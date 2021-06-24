@@ -5,6 +5,16 @@ from pathlib import Path
 from PIL import Image
 
 
+def save_as_indexed_png(filepath: Path, gray):
+    palette = sum([
+        [0, 0, 0],
+        [255, 255, 255]]
+    , [])
+
+    with Image.fromarray(gray, mode="P") as img:
+        img.putpalette(palette)
+        img.save(str(filepath))
+
 d = Path("data/SegmentationClass")
 out_d = Path("zero_one")
 if not out_d.exists():
@@ -21,7 +31,4 @@ for path in d.glob("*.png"):
     print(np.sum(valid))
     rs, cs = valid.nonzero()
     output[rs, cs, :] = [1, 1, 1]
-    with Image.fromarray(output[:, :, 0], mode="P") as img:
-        img.putpalette(sum([[0, 0, 0], [255, 255, 255]], []))
-        img.save(str(out_d / path.name))
-    # zero_one = image.array_to_img(output, scale=False)
+    save_as_indexed_png(out_d / path.name, output[:, :, 0])

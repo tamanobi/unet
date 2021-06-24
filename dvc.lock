@@ -7,8 +7,11 @@ stages:
       md5: 1a21b645fa62272a505c3d59e7c3075e.dir
       size: 6704
       nfiles: 2
+    - path: preprocess.py
+      md5: 5f3f05576c378ec694b2c4048cac44c3
+      size: 938
     outs:
     - path: ./zero_one/
-      md5: 2bfab206535e5bb969245429ae8ecdcb.dir
-      size: 4383
+      md5: 12d8594706328c33bee1e02abbba3a71.dir
+      size: 412
       nfiles: 2
