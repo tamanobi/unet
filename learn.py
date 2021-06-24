@@ -26,7 +26,7 @@ def image_pairs(config: DirPair) -> Generator[Tuple[Path, Path], None, None]:
         yield path, mask
 
 
-def generator(datum: Generator[Tuple[Path, Path], None, None]) -> Generator[dict, None, None]:
+def image_loader(datum: Generator[Tuple[Path, Path], None, None]) -> Generator[dict, None, None]:
     """numpy 形式で画像を読み込む"""
     for img, mask in datum:
         base_img = image.load_img(str(img))
@@ -36,7 +36,7 @@ def generator(datum: Generator[Tuple[Path, Path], None, None]) -> Generator[dict
             "mask": image.img_to_array(mask_img, dtype=np.uint8)
         }
 
-generator(image_pairs(config))
+image_loader(image_pairs(config))
 
 def normalize(input_image, input_mask):
   input_image = tf.cast(input_image, tf.float32) / 255.0
