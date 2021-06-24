@@ -1,20 +1,31 @@
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from pathlib import Path
-from typing import Generator, Tuple
+from typing import Generator, Tuple, Protocol
 
-class Config:
-    IMAGE_DIR = "data/SegmentationClass"
-    MASK_DIR = "zero_one/"
+class DirPair(Protocol):
+    IMAGE_DIR: str
+    MASK_DIR: str
 
-def image_pairs() -> Generator[Tuple[Path, Path], None, None]:
-    for path in Path(Config.IMAGE_DIR).iterdir():
-        mask = Path(Config.MASK_DIR) / path.name
+class Config(DirPair):
+    IMAGE_DIR: str = "data/SegmentationClass"
+    MASK_DIR: str = "zero_one/"
+
+class ConfigFactory:
+    @classmethod
+    def create(cls) -> Config:
+        return Config()
+
+config = ConfigFactory.create()
+
+def image_pairs(config: DirPair) -> Generator[Tuple[Path, Path], None, None]:
+    for path in Path(config.IMAGE_DIR).iterdir():
+        mask = Path(config.MASK_DIR) / path.name
         assert mask.exists()
         yield path, mask
 
 
-for img, mask in image_pairs():
+for img, mask in image_pairs(config):
     print(img, mask)
 
 
